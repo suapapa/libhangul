@@ -1690,3 +1690,5 @@ static const HangulCombinationItem hangul_combination_table_ahn[] = {
   { 0x11c211bd, 0x11be }, /* jongseong hieuh        + cieuc  = chieuch       */
   { 0x11ce11c2, 0x11b4 }, /* jongseong rieul-tikeut + hieuh  = rieul-thieuth */
 };
+
+#include "hangulkeyboard_cji.h"

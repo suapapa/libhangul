@@ -203,6 +203,7 @@ struct _HangulCombinationItem {
 struct _HangulCombination {
     int size;
     HangulCombinationItem *table;
+    bool not_sorted;
 };
 
 struct _HangulBuffer {
@@ -255,6 +256,12 @@ static const HangulCombination hangul_combination_full = {
 static const HangulCombination hangul_combination_ahn = {
     N_ELEMENTS(hangul_combination_table_ahn),
     (HangulCombinationItem*)hangul_combination_table_ahn
+};
+
+static const HangulCombination hangul_combination_cji = {
+    .size = N_ELEMENTS(hangul_combination_table_cji),
+    .table = (HangulCombinationItem*)hangul_combination_table_cji,
+    .not_sorted = true,
 };
 
 static const HangulKeyboard hangul_keyboard_2 = {
@@ -329,6 +336,14 @@ static const HangulKeyboard hangul_keyboard_ahn = {
     &hangul_combination_ahn
 };
 
+static const HangulKeyboard hangul_keyboard_cji = {
+    HANGUL_KEYBOARD_TYPE_JAMO,
+    "cji",
+    N_("ChunJiIn"),
+    (ucschar*)hangul_keyboard_table_cji,
+    &hangul_combination_cji
+};
+
 static const HangulKeyboard* hangul_keyboards[] = {
     &hangul_keyboard_2,
     &hangul_keyboard_2y,
@@ -339,6 +354,7 @@ static const HangulKeyboard* hangul_keyboards[] = {
     &hangul_keyboard_32,
     &hangul_keyboard_romaja,
     &hangul_keyboard_ahn,
+    &hangul_keyboard_cji,
 };
 
 
@@ -494,15 +510,26 @@ ucschar
 hangul_combination_combine(const HangulCombination* combination,
 			   ucschar first, ucschar second)
 {
-    HangulCombinationItem *res;
+    HangulCombinationItem *res = NULL;
     HangulCombinationItem key;
 
     if (combination == NULL)
 	return 0;
 
     key.key = hangul_combination_make_key(first, second);
-    res = bsearch(&key, combination->table, combination->size,
-	          sizeof(combination->table[0]), hangul_combination_cmp);
+    if (combination->not_sorted == false) {
+        res = bsearch(&key, combination->table, combination->size,
+                sizeof(combination->table[0]), hangul_combination_cmp);
+    } else {
+        int i;
+        for(i = 0; i < combination->size; i++) {
+            if (combination->table[i].key == key.key) {
+                res = &(combination->table[i]);
+                break;
+            }
+        }
+    }
+
     if (res != NULL)
 	return res->code;
 

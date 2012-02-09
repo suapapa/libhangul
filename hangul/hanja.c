@@ -478,8 +478,13 @@ hanja_table_load(const char* filename)
     HanjaIndex* keytable;
     HanjaTable* table;
 
-    if (filename == NULL)
-	filename = LIBHANGUL_DEFAULT_HANJA_DIC;
+    if (filename == NULL) {
+#ifdef LIBHANGUL_DEFAULT_HANJA_DIC
+        filename = LIBHANGUL_DEFAULT_HANJA_DIC;
+#else
+        return NULL;
+#endif
+    }
 
     file = fopen(filename, "r");
     if (file == NULL) {

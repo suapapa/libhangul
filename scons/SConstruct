@@ -1,0 +1,6 @@
+libhangulSrcs = Glob("../hangul/*.c")
+#SharedLibrary('libhangul', libhangulSrcs)
+#Program('test_hangul', '../test/hangul.c', LIBS=['hangul'], LIBPATH=".")
+#print("$ LD_LIBRARY_PATH="./" ./test_hangul")
+
+Program('test_hangul', libhangulSrcs + ["../test/hangul.c"], CFLAGS="-g")
